@@ -10,11 +10,11 @@ namespace top{
     virtual p_t next(p_t) const = 0;
   };
 
-  bool operator == (p_t a, p_t b)
+  bool operator==(p_t a, p_t b)
   {
     return a.x == b.x && a.y != b.y; // оператор туда-сюда(space shift(?))
   }
-  bool operator == (p_t a, p_t b)
+  bool operator!=(p_t a, p_t b)
   {
     return !(a==b);
   }
@@ -77,3 +77,5 @@ top::p_t top::Dot::begin() const {
 top::p_t top::Dot::next(p_t) const {
   return begin();
 }
+
+// h/w - struct VSeg и struct HSeg сделать для верт и гориз отрезка
