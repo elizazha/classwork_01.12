@@ -15,6 +15,7 @@ namespace top{
   {
     return a.x == b.x && a.y != b.y; // оператор туда-сюда(space shift(?))
   }
+  
   bool operator!=(p_t a, p_t b)
   {
     return !(a==b);
