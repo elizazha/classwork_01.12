@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 namespace top{
 
   struct p_t{
@@ -46,21 +47,98 @@ namespace top{
   void print_canvas(std::ostream& os, const char* cnv, frame_t fr);
   void extend(p_t** pts, size_t s, p_t p);
 
-  struct VSeg
+struct Vseg : IDraw
   {
+    p_t begin() const override;
+    p_t next(p_t) const override;
     int x;
-    int bot_y;
-    int top_y;
+    int y1, y2;
+    Vseg(int xx, int yy1, int yy2);
   };
 
-  struct HSeg
+ struct Hseg : IDraw
   {
+    p_t begin() const override;
+    p_t next(p_t) const override;
     int y;
-    int left_x;
-    int right_x;
+    int x1, x2;
+    Hseg(int yy, int xx1, int xx2);
+  };
+
+  struct Seg_45 : IDraw
+  {
+    p_t begin() const override;
+    p_t next(p_t) const override;
+    p_t bot;
+    p_t top;
+    Seg_45(int xbot, int ybot, int xtop, int ytop);
   };
 
   
+}
+
+top::Vseg::Vseg(int xx, int yy1, int yy2):
+  x{xx}, y1{yy1}, y2{yy2}
+{}
+
+top::p_t top::Vseg::begin() const
+{
+  return p_t{x, std::min(y1, y2)};
+}
+
+top::p_t top::Vseg::next(p_t current) const
+{
+  int maxy = std::max(y1, y2);
+  if (current.y < maxy) {
+      return p_t{x, current.y + 1};
+  }
+  return begin();
+}
+
+
+top::Hseg::Hseg(int yy, int xx1, int xx2):
+  y{yy}, x1{xx1}, x2{xx2}
+{}
+top::p_t top::Hseg::begin() const
+{
+  return p_t{std::min(x1, x2), y};
+}
+
+top::p_t top::Hseg::next(p_t current) const
+{
+  int maxx = std::max(x1, x2);
+  if (current.x < maxx)
+  {
+    return p_t{current.x + 1, y};
+  }
+  return begin();
+}
+
+
+top::Seg_45::Seg_45(int xbot, int ybot, int xtop, int ytop):
+  bot{xbot, ybot}, top{xtop, ytop}
+{
+  int left_x = std::min(xbot, xtop);
+  int right_x = std::max(xbot, xtop);
+  int bottom_y = std::min(ybot, ytop);
+  int top_y = std::max(ybot, ytop);
+  
+  bot = p_t{left_x, bottom_y};
+  top = p_t{right_x, top_y};
+}
+
+top::p_t top::Seg_45::begin() const
+{
+  return bot;
+}
+
+top::p_t top::Seg_45::next(p_t current) const
+{
+  if (current.x < top.x && current.y < top.y)
+  {
+    return p_t {current.x + 1, current.y + 1};
+  }
+  return begin();
 }
 
 void top::extend(p_t** pts, size_t s, p_t p)
@@ -169,10 +247,15 @@ top::p_t top::Dot::next(p_t) const {
   return begin();
 }
 
+// void top::make_f(IDraw** b, size_t k) {
+//     b[0] = new Dot(0, 0);
+//     b[1] = new Dot(1, 1);
+//     b[2] = new Dot(2, 2);
+// }
 void top::make_f(IDraw** b, size_t k) {
-    b[0] = new Dot(0, 0);
-    b[1] = new Dot(1, 1);
-    b[2] = new Dot(2, 2);
+    if (k >= 1) b[0] = new Vseg(2, 0, 4);
+    if (k >= 2) b[1] = new Hseg(2, 0, 4);
+    if (k >= 3) b[2] = new Seg_45(0, 0, 4, 4);
 }
 
 int main()
@@ -190,7 +273,7 @@ int main()
       get_points(*(f[i]), &p, s);
     }
     frame_t fr = build_frame(p, s);
-    cnv = build_canvas(fr, '*');
+    cnv = build_canvas(fr, '_');
     for (size_t i = 0; i < s; ++i)
     {
       paint_canvas(cnv, fr, p[i], '.');
