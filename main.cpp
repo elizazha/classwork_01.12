@@ -13,9 +13,9 @@ namespace top{
 
   bool operator==(p_t a, p_t b)
   {
-    return a.x == b.x && a.y != b.y; // оператор туда-сюда(space shift(?))
+    return a.x == b.x && a.y == b.y; // оператор туда-сюда(space shift(?))
   }
-  
+
   bool operator!=(p_t a, p_t b)
   {
     return !(a==b);
@@ -75,22 +75,24 @@ void top::extend(p_t** pts, size_t s, p_t p)
     *pts = res;
 }
 
-size_t top::get_points(const top::IDraw& d, top::p_t** pts, size_t& s)
-{
+size_t top::get_points(const IDraw& d, p_t** pts, size_t& s) {
     p_t p = d.begin();
     // добавить массив в начало
     extend(pts, s, p);
     size_t delta = 1;
-    while (d.next(p) != d.begin())
-    {
-        p = d.next(p);
+    p_t next_p = d.next(p);
+    while (next_p != d.begin()) {
+        extend(pts, s + delta, next_p);
+        ++delta;
         //р добавить в массив
-        extend(pts, s + delta, p);
-        delta++;
+        p = next_p;
+        next_p = d.next(p);
     }
     s += delta;
     return delta;
 }
+
+
 
 top::frame_t top::build_frame(const p_t* pts, size_t s)
 {
@@ -149,10 +151,15 @@ void top::print_canvas(std::ostream& os, const char* cnv, frame_t fr)
     }
 }
 
+top::Dot::Dot(int x, int y) :
+    IDraw(),
+    o{x, y}
+{}
+
 top::Dot::Dot(p_t dd):
   IDraw(),
   o{dd}
-  {}
+{}
 
   top::p_t top::Dot::begin() const {
   return o;
@@ -160,6 +167,12 @@ top::Dot::Dot(p_t dd):
 
 top::p_t top::Dot::next(p_t) const {
   return begin();
+}
+
+void top::make_f(IDraw** b, size_t k) {
+    b[0] = new Dot(0, 0);
+    b[1] = new Dot(1, 1);
+    b[2] = new Dot(2, 2);
 }
 
 int main()
@@ -180,7 +193,7 @@ int main()
     cnv = build_canvas(fr, '*');
     for (size_t i = 0; i < s; ++i)
     {
-    paint_canvas(cnv, fr, p[i], '.');
+      paint_canvas(cnv, fr, p[i], '.');
     }
     print_canvas(std::cout, cnv, fr);
   }
