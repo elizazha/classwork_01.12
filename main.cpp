@@ -333,10 +333,16 @@ top::p_t top::Dot::next(p_t) const {
 //     b[1] = new Dot(1, 1);
 //     b[2] = new Dot(2, 2);
 // }
+//
+// void top::make_f(IDraw** b, size_t k) {
+//     if (k >= 1) b[0] = new Vseg(2, 0, 4);
+//     if (k >= 2) b[1] = new Hseg(2, 0, 4);
+//     if (k >= 3) b[2] = new Seg_45(0, 0, 4, 4);
+// }
 void top::make_f(IDraw** b, size_t k) {
-    if (k >= 1) b[0] = new Vseg(2, 0, 4);
-    if (k >= 2) b[1] = new Hseg(2, 0, 4);
-    if (k >= 3) b[2] = new Seg_45(0, 0, 4, 4);
+    if (k >= 1) b[0] = new Square(1, 1, 5);
+    if (k >= 2) b[1] = new Rectangle(8, 2, 6, 4);
+    if (k >= 3) b[2] = new Seg_45(1, 8, 5, 12);
 }
 
 int main()
