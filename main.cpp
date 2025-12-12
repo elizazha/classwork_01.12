@@ -74,7 +74,88 @@ struct Vseg : IDraw
     Seg_45(int xbot, int ybot, int xtop, int ytop);
   };
 
+  struct Square: IDraw
+  {
+    p_t begin() const override;
+    p_t next(p_t) const override;
+    int x, y, side;
+    Square(int x1, int y2, int a);
+
+  };
+
+  struct Rectangle: IDraw
+  {
+    p_t begin() const override;
+    p_t next(p_t) const override;
+    int x, y, horside, vertside;
+    Rectangle(int x1, int y1, int horside1, int vertside1);
+  };
   
+}
+
+top::Rectangle::Rectangle(int x1, int y1, int horside1, int vertside1):
+  x{x1}, y{y1}, horside{horside1}, vertside{vertside1}
+  {}
+
+top::p_t top::Rectangle::begin() const
+{
+  return p_t{x, y};
+}
+
+top::p_t top::Rectangle::next(p_t current) const
+{
+  int right_x = x + horside -1;
+  int top_y = y + vertside -1;
+  if (current.x < right_x && current.y == y)
+  {
+    return p_t{current.x + 1, y};
+  }
+  else if (current.x == right_x && current.y < top_y)
+  {
+    return p_t{right_x, current.y + 1};
+  }
+  else if (current.x > x && current.y == top_y)
+  {
+    return p_t{current.x - 1, top_y};
+  }
+  else if(current.x == x && current.y > y)
+  {
+    return p_t{x, current.y - 1};
+  }
+  return begin();
+}
+
+
+top::Square::Square(int x1, int y2, int a):
+  x{x1}, y{y2}, side{a}
+  {}
+
+top::p_t top::Square::begin() const
+{
+  return p_t{x, y};
+}
+
+top::p_t top::Square::next(p_t current) const
+{
+  int right_x = x + side - 1;
+  int top_y = y + side - 1;
+  if (current.x < right_x && current.y == y)
+  {
+    return p_t{current.x+1, y};
+  }
+  else if ( current.x == right_x && current.y < top_y)
+  {
+    return p_t{right_x, current.y + 1};
+  }
+  else if (current.y == top_y && current.x > x)
+  {
+    return p_t{current.x - 1, top_y};
+  }
+  else if ( current.x == x && current.y > y)
+  {
+    return p_t{x, current.y - 1};
+  }
+  return begin();
 }
 
 top::Vseg::Vseg(int xx, int yy1, int yy2):
