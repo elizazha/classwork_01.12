@@ -1,9 +1,7 @@
 #include <iostream>
 #include <stdexept>
 #include <algorithm>
-#include "geom.hpp"
-#include "idraw.hpp"
-#include "dot.hpp"
+#include "ascii_draw"
 namespace top{
   size_t rows(frame_t fr);
   size_t cols(frame_t fr);
